@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { db } from './firebase'; 
 import { ref as dRef, push, onValue } from 'firebase/database';
-import { Upload, ChevronLeft, Loader2, PlayCircle } from 'lucide-react';
+import { Upload, ChevronLeft, Loader2 } from 'lucide-react';
 
 // ==========================================
 // 1. YOUR CLOUD KEYS
@@ -41,7 +41,7 @@ export default function App() {
   const [cat, setCat] = useState(null);
   const [videos, setVideos] = useState([]);
   const [up, setUp] = useState(false); 
-  const [showModal, setShowModal] = useState(false); // FIXED STATE NAME
+  const [showModal, setShowModal] = useState(false); 
 
   // 3. FETCH GLOBAL FEED FROM FIREBASE
   useEffect(() => {
@@ -55,7 +55,7 @@ export default function App() {
     });
   }, []);
 
-  // 4. UPLOAD LOGIC (Cloudinary + Firebase)
+  // 4. UPLOAD LOGIC
   const handleUpload = async (e) => {
     e.preventDefault();
     const f = new FormData(e.target);
@@ -69,7 +69,6 @@ export default function App() {
     data.append("resource_type", "video");
 
     try {
-      // FIXED FETCH URL TO CLOUDINARY API
       const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/video/upload`, {
         method: "POST",
         body: data
@@ -98,7 +97,7 @@ export default function App() {
       {/* BACKGROUND VIDEO */}
       <div className="bg-wrap">
         <video autoPlay muted loop playsInline className="bg-video">
-          <source src="https://res.cloudinary.com/dvibaro5c/video/upload/q_auto/f_auto/v1775758805/campus_y8fgok.mp4" type="video/mp4" />
+          <source src="https://res.cloudinary.com/dvibaro5c/video/upload/q_auto/f_auto/v1712680000/campus_y8fgok.mp4" type="video/mp4" />
         </video>
         <div className="overlay"></div>
       </div>
@@ -120,7 +119,6 @@ export default function App() {
 
       {/* MAIN VIEWPORT */}
       <main>
-        {/* VIEW: LANDING PAGE */}
         {view === 'landing' && (
           <div className="hero-wrapper">
             <h1 className="hero-title">VIT VIDEO HUB</h1>
@@ -129,7 +127,6 @@ export default function App() {
           </div>
         )}
 
-        {/* VIEW: SCHOOLS GRID */}
         {view === 'schools' && (
           <div className="grid">
             {Object.keys(DATA).slice(0, 17).map(s => (
@@ -140,7 +137,6 @@ export default function App() {
           </div>
         )}
 
-        {/* VIEW: VIDEO LIST */}
         {view === 'detail' && (
           <div style={{padding: '120px 8% 60px'}}>
             <button className="btn" style={{background:'none', border:'1px solid white'}} onClick={() => setView('schools')}>
