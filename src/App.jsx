@@ -10,7 +10,7 @@ const CLOUD_NAME = "dvibaro5c";
 const UPLOAD_PRESET = "VIT_Portal"; 
 
 // ==========================================
-// 2. FULL VIT DATA (Schools, Fests, Sports, Events)
+// 2. FULL VIT DATA
 // ==========================================
 const DATA = {
   "SBST": ["B.Tech. Biotechnology", "PG: Biotechnology", "PG: Biomedical Genetics", "Applied Microbiology", "Ph.D.: Biotechnology"],
@@ -41,7 +41,7 @@ export default function App() {
   const [cat, setCat] = useState(null);
   const [videos, setVideos] = useState([]);
   const [up, setUp] = useState(false); 
-  const [modal, setModal] = useState(false);
+  const [showModal, setShowModal] = useState(false); // FIXED STATE NAME
 
   // 3. FETCH GLOBAL FEED FROM FIREBASE
   useEffect(() => {
@@ -50,7 +50,7 @@ export default function App() {
       const data = snap.val();
       if (data) {
         const list = Object.keys(data).map(key => ({ id: key, ...data[key] }));
-        setVideos(list.reverse()); // Newest first
+        setVideos(list.reverse()); 
       }
     });
   }, []);
@@ -69,6 +69,7 @@ export default function App() {
     data.append("resource_type", "video");
 
     try {
+      // FIXED FETCH URL TO CLOUDINARY API
       const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/video/upload`, {
         method: "POST",
         body: data
@@ -83,7 +84,8 @@ export default function App() {
         createdAt: Date.now()
       });
 
-      setUp(false); setModal(false);
+      setUp(false); 
+      setShowModal(false);
       alert("Success! Published to Global VIT Feed.");
     } catch (err) {
       alert("Upload failed. Check your connection.");
@@ -96,7 +98,6 @@ export default function App() {
       {/* BACKGROUND VIDEO */}
       <div className="bg-wrap">
         <video autoPlay muted loop playsInline className="bg-video">
-          {/* PASTE YOUR CLOUDINARY BACKGROUND VIDEO LINK HERE */}
           <source src="https://res.cloudinary.com/dvibaro5c/video/upload/q_auto/f_auto/v1775758805/campus_y8fgok.mp4" type="video/mp4" />
         </video>
         <div className="overlay"></div>
@@ -111,7 +112,7 @@ export default function App() {
           <span onClick={() => {setCat('Riviera'); setView('detail')}}>Riviera</span>
           <span onClick={() => {setCat('Physical Education'); setView('detail')}}>Sports</span>
           <span onClick={() => {setCat('Internal Events'); setView('detail')}}>Events</span>
-          <button className="btn" style={{padding: '8px 20px', fontSize: '0.7rem'}} onClick={() => setModal(true)}>
+          <button className="btn" style={{padding: '8px 20px', fontSize: '0.7rem'}} onClick={() => setShowModal(true)}>
             <Upload size={14} style={{marginRight: 8}} /> Upload
           </button>
         </div>
@@ -145,7 +146,7 @@ export default function App() {
             <button className="btn" style={{background:'none', border:'1px solid white'}} onClick={() => setView('schools')}>
               <ChevronLeft size={16}/> Back
             </button>
-            <h1 style={{fontSize: '3.5rem', margin: '20px 0'}}>{cat}</h1>
+            <h1 style={{fontSize: '3.5rem', margin: '20px 0', textTransform: 'uppercase'}}>{cat}</h1>
             <div className="v-grid">
               {videos.filter(v => v.cat === cat).map(v => (
                 <div key={v.id} className="v-card">
