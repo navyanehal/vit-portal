@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { db } from './firebase';
 import { ref as dRef, push, onValue } from 'firebase/database';
-import { Upload, ChevronLeft, Loader2, Home } from 'lucide-react';
+import { Upload, ChevronLeft, Loader2, Home, Menu, X } from 'lucide-react';
 
 // ==========================================
 // CONFIGURATION
@@ -34,6 +34,7 @@ export default function App() {
   const [videos, setVideos] = useState([]);
   const [uploading, setUploading] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     const vRef = dRef(db, 'videos');
@@ -45,6 +46,13 @@ export default function App() {
       }
     });
   }, []);
+
+  const navigate = (newView, category = null) => {
+    setView(newView);
+    setCat(category);
+    setSidebarOpen(false); // Close sidebar whenever we navigate
+    window.scrollTo(0,0);
+  };
 
   const handleUpload = async (e) => {
     e.preventDefault();
@@ -87,35 +95,62 @@ export default function App() {
         <div className="overlay"></div>
       </div>
 
+      {/* DESKTOP NAV & MOBILE HEADER */}
       <nav>
-        <div className="logo" onClick={() => setView('landing')}>VIT PORTAL</div>
-        <div className="nav-links">
-          {/* ADDED HOME BUTTON */}
-          <span onClick={() => setView('landing')}>Home</span>
-          <span onClick={() => setView('schools')}>Schools</span>
-          <span onClick={() => {setCat('Gravitas'); setView('detail')}}>Gravitas</span>
-          <span onClick={() => {setCat('Riviera'); setView('detail')}}>Riviera</span>
-          <span onClick={() => {setCat('Physical Education'); setView('detail')}}>Sports</span>
-          <span onClick={() => {setCat('Internal Events'); setView('detail')}}>Events</span>
-          <button className="btn" style={{padding: '5px 15px', fontSize: '0.65rem'}} onClick={() => setShowModal(true)}>
-            <Upload size={12} style={{marginRight: 5}} /> Upload
+        <div className="nav-container">
+          <div className="logo" onClick={() => navigate('landing')}>VIT PORTAL</div>
+          
+          {/* Desktop Only Links */}
+          <div className="desktop-links">
+            <span onClick={() => navigate('landing')}>Home</span>
+            <span onClick={() => navigate('schools')}>Schools</span>
+            <span onClick={() => navigate('detail', 'Gravitas')}>Gravitas</span>
+            <span onClick={() => navigate('detail', 'Riviera')}>Riviera</span>
+            <span onClick={() => navigate('detail', 'Physical Education')}>Sports</span>
+            <span onClick={() => navigate('detail', 'Internal Events')}>Events</span>
+            <button className="btn upload-btn-small" onClick={() => setShowModal(true)}>Upload</button>
+          </div>
+
+          {/* Mobile Only Hamburger */}
+          <button className="mobile-menu-btn" onClick={() => setSidebarOpen(true)}>
+            <Menu size={28} />
           </button>
         </div>
       </nav>
+
+      {/* MOBILE SIDEBAR */}
+      <div className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
+        <div className="sidebar-header">
+          <div className="logo">MENU</div>
+          <button onClick={() => setSidebarOpen(false)}><X size={28} /></button>
+        </div>
+        <div className="sidebar-links">
+          <span onClick={() => navigate('landing')}><Home size={18}/> Home</span>
+          <span onClick={() => navigate('schools')}>Schools</span>
+          <span onClick={() => navigate('detail', 'Gravitas')}>Gravitas</span>
+          <span onClick={() => navigate('detail', 'Riviera')}>Riviera</span>
+          <span onClick={() => navigate('detail', 'Physical Education')}>Sports</span>
+          <span onClick={() => navigate('detail', 'Internal Events')}>Events</span>
+          <button className="btn" onClick={() => {setShowModal(true); setSidebarOpen(false);}}>Upload Video</button>
+        </div>
+      </div>
+
+      {/* BACKDROP FOR SIDEBAR */}
+      {sidebarOpen && <div className="sidebar-overlay" onClick={() => setSidebarOpen(false)}></div>}
 
       <main>
         {view === 'landing' && (
           <div className="hero-wrapper">
             <h1 className="hero-title">VIT VIDEO HUB</h1>
             <p className="hero-subtitle">The Cloud Archive for VITians</p>
-            <button className="btn" onClick={() => setView('schools')}>Explore Archives</button>
+            <button className="btn" onClick={() => navigate('schools')}>Get Started</button>
           </div>
         )}
 
         {view === 'schools' && (
           <div className="grid">
             {Object.keys(SCHOOL_DATA).slice(0, 12).map(s => (
-              <div key={s} className="playcard" onClick={() => {setCat(s); setView('detail')}}>
+              <div key={s} className="playcard" onClick={() => navigate('detail', s)}>
                 <h3>{s}</h3>
               </div>
             ))}
@@ -123,45 +158,44 @@ export default function App() {
         )}
 
         {view === 'detail' && (
-          <div style={{padding: '100px 5% 60px'}}>
-            <button className="btn" style={{background:'none', border:'1px solid white', padding:'8px 15px'}} onClick={() => setView('schools')}>
-              <ChevronLeft size={14}/> Back
+          <div className="detail-container">
+            <button className="btn btn-outline" onClick={() => navigate('schools')}>
+              <ChevronLeft size={16}/> Back
             </button>
-            <h1 style={{fontSize: '2rem', margin: '15px 0', textTransform: 'uppercase'}}>{cat}</h1>
+            <h1 className="category-title">{cat}</h1>
             <div className="v-grid">
               {videos.filter(v => v.cat === cat).map(v => (
                 <div key={v.id} className="v-card">
                   <video controls className="feed-video" src={v.url} />
-                  <div style={{padding: 15}}>
-                    <h4 style={{margin:0, fontSize: '1rem'}}>{v.title}</h4>
-                    <p style={{fontSize: '0.75rem', opacity: 0.6}}>{v.sub}</p>
+                  <div className="v-info">
+                    <h4>{v.title}</h4>
+                    <p>{v.sub}</p>
                   </div>
                 </div>
               ))}
-              {videos.filter(v => v.cat === cat).length === 0 && <p style={{opacity: 0.5}}>No uploads yet.</p>}
+              {videos.filter(v => v.cat === cat).length === 0 && <p className="empty-msg">No uploads yet.</p>}
             </div>
           </div>
         )}
       </main>
 
+      {/* UPLOAD MODAL */}
       {showModal && (
         <div className="modal-overlay">
           <div className="modal-content">
-            <h2 style={{marginTop: 0, fontSize:'1.2rem'}}>{uploading ? 'Uploading...' : 'Upload Video'}</h2>
+            <h2 style={{marginTop: 0}}>{uploading ? 'Processing...' : 'Upload Video'}</h2>
             {uploading ? (
-              <div style={{textAlign: 'center', padding: '20px 0'}}>
-                <Loader2 className="spinner" size={30} color="#1e90ff" />
-              </div>
+              <div className="loader-box"><Loader2 className="spinner" size={40} /></div>
             ) : (
               <form onSubmit={handleUpload}>
                 <input name="title" placeholder="Video Title" required />
                 <select name="cat">
                   {Object.keys(SCHOOL_DATA).map(k => <option key={k} value={k}>{k}</option>)}
                 </select>
-                <input name="sub" placeholder="Program/Year" required />
+                <input name="sub" placeholder="Program/Branch" required />
                 <input type="file" name="vid" accept="video/*" required />
-                <button type="submit" className="btn" style={{width:'100%', marginTop: 15}}>Publish</button>
-                <button type="button" onClick={() => setShowModal(false)} style={{width:'100%', background:'none', color:'white', border:'none', marginTop: 10}}>Cancel</button>
+                <button type="submit" className="btn btn-block">Publish Globally</button>
+                <button type="button" onClick={() => setShowModal(false)} className="btn-text">Cancel</button>
               </form>
             )}
           </div>
