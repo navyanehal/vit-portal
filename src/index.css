@@ -14,7 +14,7 @@ body {
   overflow-x: hidden;
 }
 
-/* Background */
+/* Background Engine */
 .bg-wrap {
   position: fixed;
   top: 0; left: 0; width: 100%; height: 100%;
@@ -35,25 +35,67 @@ body {
   z-index: -9;
 }
 
-/* Nav */
+/* Navigation - Mobile Friendly */
 nav {
   position: fixed;
-  top: 0; width: 100%; height: 80px;
-  display: flex; justify-content: space-between; align-items: center;
-  padding: 0 5%; 
+  top: 0; width: 100%; height: 70px;
+  display: flex; 
+  flex-direction: column; /* Stack logo and links on very small screens */
+  justify-content: center;
+  align-items: center;
+  padding: 10px 5%; 
   z-index: 9999; 
   backdrop-filter: blur(20px);
-  background: rgba(0,0,0,0.5);
+  background: rgba(0,0,0,0.6);
   border-bottom: 1px solid var(--glass-border);
   box-sizing: border-box;
 }
 
-.logo { font-weight: 800; font-size: 1.5rem; letter-spacing: 2px; cursor: pointer; }
-.nav-links { display: flex; gap: 20px; align-items: center; }
-.nav-links span { cursor: pointer; font-weight: 600; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.5px; }
+.logo { 
+  font-weight: 800; 
+  font-size: 1.2rem; 
+  letter-spacing: 1px; 
+  cursor: pointer;
+  margin-bottom: 5px;
+}
+
+.nav-links { 
+  display: flex; 
+  gap: 15px; 
+  align-items: center;
+  width: 100%;
+  justify-content: center;
+  overflow-x: auto; /* Allows swiping on mobile */
+  white-space: nowrap;
+  padding-bottom: 5px;
+  scrollbar-width: none; /* Hide scrollbar for Chrome/Safari */
+}
+
+.nav-links::-webkit-scrollbar { display: none; }
+
+.nav-links span { 
+  cursor: pointer; 
+  font-weight: 600; 
+  text-transform: uppercase; 
+  font-size: 0.7rem; 
+  letter-spacing: 0.5px;
+}
+
 .nav-links span:hover { color: var(--accent); }
 
-/* Landing */
+/* Desktop Adjustment for Nav */
+@media (min-width: 768px) {
+  nav {
+    flex-direction: row;
+    justify-content: space-between;
+    height: 80px;
+  }
+  .logo { font-size: 1.5rem; margin-bottom: 0; }
+  .nav-links { width: auto; gap: 25px; font-size: 0.85rem; }
+  .nav-links span { font-size: 0.85rem; }
+}
+
+/* Landing Page Centering */
 .hero-wrapper {
   display: flex;
   flex-direction: column;
@@ -62,88 +104,100 @@ nav {
   text-align: center;
   min-height: 100vh;
   width: 100%;
+  padding: 20px;
+  box-sizing: border-box;
 }
 
 .hero-title {
-  font-size: clamp(3rem, 10vw, 6rem);
+  font-size: clamp(2.5rem, 8vw, 5rem);
   font-weight: 800;
   margin: 0;
   background: linear-gradient(to right, #fff, var(--accent));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  line-height: 1.1;
 }
 
-.hero-subtitle { font-size: 1.2rem; opacity: 0.7; margin: 20px 0 40px; }
+.hero-subtitle { font-size: 1rem; opacity: 0.7; margin: 15px 0 30px; }
 
 /* Buttons */
 .btn {
   background: var(--accent);
   color: white;
   border: none;
-  padding: 14px 35px;
+  padding: 12px 30px;
   border-radius: 50px;
   font-weight: 700;
   cursor: pointer;
   transition: 0.3s;
   text-transform: uppercase;
   font-family: 'Poppins';
+  font-size: 0.8rem;
 }
 
-.btn:hover { transform: scale(1.05); background: white; color: black; box-shadow: 0 0 25px var(--accent); }
+.btn:hover { transform: scale(1.05); background: white; color: black; }
 
-/* Playcard Grid */
+/* Grid System - Mobile Responsive */
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 20px;
-  padding: 120px 8% 60px;
+  /* On mobile: 2 cards per row. On desktop: auto-fill */
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 15px;
+  padding: 120px 5% 60px;
+}
+
+@media (min-width: 768px) {
+  .grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 25px;
+    padding: 140px 8% 60px;
+  }
 }
 
 .playcard {
   background: var(--glass);
   backdrop-filter: blur(15px);
   border: 1px solid var(--glass-border);
-  height: 150px;
+  height: 120px;
   border-radius: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: 0.4s;
+  text-align: center;
+  padding: 10px;
 }
 
-.playcard h3 { font-size: 1.4rem; font-weight: 800; margin: 0; text-align: center; }
-.playcard:hover { transform: translateY(-10px); border-color: var(--accent); background: rgba(255,255,255,0.2); }
+@media (min-width: 768px) {
+  .playcard { height: 160px; border-radius: 25px; }
+}
+
+.playcard h3 { font-size: 1rem; font-weight: 800; margin: 0; }
+@media (min-width: 768px) { .playcard h3 { font-size: 1.4rem; } }
+
+.playcard:hover { transform: translateY(-8px); border-color: var(--accent); background: rgba(255,255,255,0.2); }
 
 /* Video Feed */
-.v-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 25px; padding: 20px 0; }
-.v-card { background: var(--glass); border-radius: 20px; overflow: hidden; border: 1px solid var(--glass-border); }
+.v-grid { 
+  display: grid; 
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+  gap: 20px; 
+  padding: 20px 0; 
+}
+.v-card { background: var(--glass); border-radius: 15px; overflow: hidden; border: 1px solid var(--glass-border); }
 video.feed-video { width: 100%; aspect-ratio: 16/9; background: #000; }
 
-/* Modal */
-.modal-overlay {
-  position: fixed;
-  top: 0; left: 0; width: 100%; height: 100%;
-  background: rgba(0,0,0,0.92);
-  display: flex; justify-content: center; align-items: center;
-  z-index: 10000;
-  backdrop-filter: blur(10px);
-}
-
+/* Modal - Mobile logic */
 .modal-content {
   background: #0a0a0a;
-  padding: 40px;
-  border-radius: 30px;
-  width: 90%;
+  padding: 25px;
+  border-radius: 25px;
+  width: 95%;
   max-width: 450px;
   border: 1px solid var(--accent);
 }
 
-input, select {
-  width: 100%; padding: 12px; margin: 10px 0;
-  background: #111; border: 1px solid #333; color: white;
-  border-radius: 10px; font-family: 'Poppins';
+@media (min-width: 768px) {
+  .modal-content { padding: 40px; }
 }
-
-.spinner { animation: rotate 1s linear infinite; }
-@keyframes rotate { from {transform: rotate(0deg);} to {transform: rotate(360deg);} }
